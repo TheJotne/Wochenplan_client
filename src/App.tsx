@@ -2,18 +2,22 @@ import { useEffect, useRef, useState } from 'react'
 
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { Page, SchoolClasses, TaskCategory, TaskControl, TaskForm } from './type/page';
+import { Page, SchoolClass, SchoolClassTypes, TaskCategory, TaskControl, TaskForm } from './type/page';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
+import { v4 as uuid } from 'uuid';
+import TaskInput from './components/TaskInput';
 
 const firstTable: Page =
 {
   pageNumber: 1,
   elements: [
     {
-      schoolClass: SchoolClasses.DEUTSCH,
+      schoolClass: SchoolClassTypes.DEUTSCH,
+
+      id: uuid(),
       tasks: [
         {
+          id: uuid(),
           category: TaskCategory.PFLICHT,
           control: TaskControl.KEINE,
           evaluation: "",
@@ -24,6 +28,7 @@ const firstTable: Page =
           symbol: "ein Bild"
         },
         {
+          id: uuid(),
           category: TaskCategory.HA,
           control: TaskControl.ABGEBEN,
           evaluation: "",
@@ -36,9 +41,12 @@ const firstTable: Page =
       ]
     },
     {
-      schoolClass: SchoolClasses.KUNST,
+      schoolClass: SchoolClassTypes.KUNST,
+
+      id: uuid(),
       tasks: [
         {
+          id: uuid(),
           category: TaskCategory.PFLICHT,
           control: TaskControl.KEINE,
           evaluation: "",
@@ -159,6 +167,13 @@ function App() {
   return (
     <>
       <h1>Das ist der Start</h1>
+      {firstTable.elements.map((page: SchoolClass) => {
+        return page.tasks.map(task => {
+          return <TaskInput task={task} />
+        })
+
+      }
+      )}
       <div ref={ref} id="container"></div>
       <button onClick={generatePdf}> pdf gernerieren</button>
     </>
