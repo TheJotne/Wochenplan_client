@@ -5,104 +5,123 @@ export interface TaskInputProps {
     task: Task
 }
 export default function TaskInput({ task }: TaskInputProps) {
-    const { addTask, updateTasks } = useTaskStore();
-    return (<div className="flex">
-        <div className="flex flex-row">
-            <input type="text" value={task.headline} />
+    const { addTask, updateTasks, saveTask } = useTaskStore();
 
-            <input type="text" value={task.subHeadline} />
+
+
+    return (<div className="designer-grid">
+        <div className="flex flex-row">
+            <input type="text" value={task.headline} onChange={(event) => {
+                let currentTask = Object.assign({}, task)
+                currentTask.headline = event.currentTarget.value
+                saveTask(currentTask)
+            }} />
+
+            <input type="text" value={task.subHeadline} onChange={(event) => {
+                let currentTask = Object.assign({}, task)
+                currentTask.subHeadline = event.currentTarget.value
+                saveTask(currentTask)
+            }} />
         </div>
-        <TaskSelect selectType={TaskSelectType.FORM} taskId={task.id} selected={task.form} />
-        <TaskSelect selectType={TaskSelectType.KATEGORIE} taskId={task.id} selected={task.category} />
-        <TaskSelect selectType={TaskSelectType.KONTROLLE} taskId={task.id} selected={task.control} />
+        <TaskSelect selectType={TaskSelectType.FORM} task={task} selected={task.form} />
+        <TaskSelect selectType={TaskSelectType.KATEGORIE} task={task} selected={task.category} />
+        <TaskSelect selectType={TaskSelectType.KONTROLLE} task={task} selected={task.control} />
+
     </div>)
 }
 
 export interface TaskSelectProps {
     selectType: TaskSelectType
-    taskId: string
+    task: Task
     selected: TaskForm | TaskCategory | TaskControl
 }
-export function TaskSelect({ selectType, taskId, selected }: TaskSelectProps) {
-
+export function TaskSelect({ selectType, task, selected }: TaskSelectProps) {
+    const { saveTask } = useTaskStore();
     switch (selectType) {
         case TaskSelectType.FORM: {
             const keys = Object.keys(TaskForm)
-            return (
-                <select name="FormSelect" id={"FormSelect" + taskId}>
-                    {
-                        keys.map((key, index) => {
-                            if (key === selected) {
-                                return (
 
-                                    <option selected value={key}>{key}</option>
-                                )
-                            }
-                            else {
-                                return (
-                                    <option selected value={key}>{key}</option>
-                                )
-                            }
-
-                        })}
-                </select>
-            )
+            return getRealSelect(keys, task, selected, saveTask, selectType)
         }
         case TaskSelectType.KATEGORIE: {
             const keys = Object.keys(TaskCategory)
-            return (
-                <select name="CategorySelect" id={"CategorySelect" + taskId}>
-                    {
-                        keys.map((key, index) => {
-                            if (key === selected) {
-                                return (
 
-                                    <option selected value={key}>{key}</option>
-                                )
-                            }
-                            else {
-                                return (
-                                    <option selected value={key}>{key}</option>
-                                )
-                            }
-
-                        })}
-                </select>
-            )
+            return getRealSelect(keys, task, selected, saveTask, selectType)
         }
         case TaskSelectType.KONTROLLE: {
             const keys = Object.keys(TaskControl)
-            return (
-                <select name="ControlSelect" id={"ControlSelect" + taskId}>
-                    {
-                        keys.map((key, index) => {
-                            if (key === selected) {
-                                return (
-
-                                    <option selected value={key}>{key}</option>
-                                )
-                            }
-                            else {
-                                return (
-                                    <option selected value={key}>{key}</option>
-                                )
-                            }
-
-                        })}
-                </select>
-            )
+            return getRealSelect(keys, task, selected, saveTask, selectType)
         }
     }
 
 }
 
+function getRealSelect(keys: string[], task: Task,
+    selected: TaskForm | TaskCategory | TaskControl,
+    saveTask: (task: Task) => void, selectType: TaskSelectType) {
+    return (
+        <select name="ControlSelect" id={"ControlSelect" + task.id} onChange={(event) => {
+            let currentTask = Object.assign({}, task)
+            switch (selectType) {
+                case TaskSelectType.FORM: {
+
+                    currentTask.form = event.currentTarget.value as TaskForm
+                }
+                case TaskSelectType.KATEGORIE: {
+                    currentTask.category = event.currentTarget.value as TaskCategory
+                }
+                case TaskSelectType.KONTROLLE: {
+                    currentTask.control = event.currentTarget.value as TaskControl
+                }
+            }
+
+            saveTask(currentTask)
+        }}>
+            {
+                keys.map((key, index) => {
+                    if (key === selected) {
+                        return (
+
+                            <option selected value={key}>{key}</option>
+                        )
+                    }
+                    else {
+                        return (
+                            <option value={key}>{key}</option>
+                        )
+                    }
+
+                })}
+        </select>
+    )
+}
+
 /*
-category: TaskCategory.PFLICHT,
-          control: TaskControl.KEINE,
-          evaluation: "",
-          form: TaskForm.EINZEL,
-          headline: "Das ist ein Test",
-          subHeadline: "darunter",
-          ready: false,
-          symbol: "ein Bild"
+ const keys = Object.keys(SchoolClassTypes)
+
+  <select name="classSelect" id={"classSelect" + task.id} onChange={(event) => {
+            let currentTask = Object.assign({}, task)
+            
+                    currentTask.control = event.currentTarget.value as TaskControl
+                
+            }
+
+            saveTask(currentTask)
+        }}>
+            {
+                keys.map((key, index) => {
+                    if (key === selected) {
+                        return (
+
+                            <option selected value={key}>{key}</option>
+                        )
+                    }
+                    else {
+                        return (
+                            <option selected value={key}>{key}</option>
+                        )
+                    }
+
+                })}
+                     </select>
 */

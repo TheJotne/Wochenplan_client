@@ -6,64 +6,15 @@ import { Page, SchoolClass, SchoolClassTypes, TaskCategory, TaskControl, TaskFor
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { v4 as uuid } from 'uuid';
 import TaskInput from './components/TaskInput';
+import { useTaskStore } from './states/TaskState';
+import './App.css'
 
-const firstTable: Page =
-{
-  pageNumber: 1,
-  elements: [
-    {
-      schoolClass: SchoolClassTypes.DEUTSCH,
 
-      id: uuid(),
-      tasks: [
-        {
-          id: uuid(),
-          category: TaskCategory.PFLICHT,
-          control: TaskControl.KEINE,
-          evaluation: "",
-          form: TaskForm.EINZEL,
-          headline: "Das ist ein Test",
-          subHeadline: "darunter",
-          ready: false,
-          symbol: "ein Bild"
-        },
-        {
-          id: uuid(),
-          category: TaskCategory.HA,
-          control: TaskControl.ABGEBEN,
-          evaluation: "",
-          form: TaskForm.GRUPPE,
-          headline: "Das ist ein Test",
-          subHeadline: "darunter",
-          ready: false,
-          symbol: "ein Bild"
-        }
-      ]
-    },
-    {
-      schoolClass: SchoolClassTypes.KUNST,
-
-      id: uuid(),
-      tasks: [
-        {
-          id: uuid(),
-          category: TaskCategory.PFLICHT,
-          control: TaskControl.KEINE,
-          evaluation: "",
-          form: TaskForm.EINZEL,
-          headline: "Das ist ein Test",
-          subHeadline: "darunter",
-          ready: false,
-          symbol: "ein Bild"
-        }
-      ]
-    }
-  ]
-}
 
 
 function App() {
   const ref = useRef<HTMLDivElement>(null)
+  const { taskPerClass, addTask, addClass } = useTaskStore();
 
   const convertBase64 = async (file: String) => {
 
@@ -90,31 +41,27 @@ function App() {
         { text: 'Lernbereich', style: 'tableHeader', colSpan: 1, alignment: 'center' },
         { text: 'Was?', style: 'tableHeader', colSpan: 1, alignment: 'center' },
         { text: 'Aufgaben', style: 'tableHeader', colSpan: 1, alignment: 'center' },
-        { text: 'Kontrolle', style: 'tableHeader', colSpan: 1, alignment: 'center' },
         { text: 'Wie?', style: 'tableHeader', colSpan: 1, alignment: 'center' },
-        { text: 'Fertig?', style: 'tableHeader', colSpan: 1, alignment: 'center' },
-        { text: 'Wie war es?', style: 'tableHeader', colSpan: 1, alignment: 'center' }
+        { text: 'Kontrolle', style: 'tableHeader', colSpan: 1, alignment: 'center' },
+        { text: '✔', style: 'tableHeader', colSpan: 1, alignment: 'center' }
       ]
     )
-    firstTable.elements.map((schoolCLassElement) => {
+    taskPerClass.map((schoolCLassElement) => {
       schoolCLassElement.tasks.map((task, index) => {
         let row
         if (index === 0) {
           row = [
-            [
-              {
-                image: image,
-                cover: { width: 70, height: 70 },
-                rowSpan: schoolCLassElement.tasks.length
-              },
-              { rowSpan: schoolCLassElement.tasks.length, text: schoolCLassElement.schoolClass, alignment: 'center' }
-            ],
+
+            {
+              image: image,
+              cover: { width: 70, height: 70 },
+              rowSpan: schoolCLassElement.tasks.length
+            },
             { text: task.category, alignment: 'center' },
             { text: task.headline + "\n" + task.subHeadline },
-            { text: task.control, alignment: 'center' },
             { text: task.form, alignment: 'center' },
+            { text: task.control, alignment: 'center' },
             { text: "", alignment: 'center' },
-            { text: task.evaluation, alignment: 'center' },
           ]
         }
         else {
@@ -122,10 +69,9 @@ function App() {
             "",
             { text: task.category, alignment: 'center' },
             { text: task.headline + "\n" + task.subHeadline },
-            { text: task.control, alignment: 'center' },
             { text: task.form, alignment: 'center' },
+            { text: task.control, alignment: 'center' },
             { text: "", alignment: 'center' },
-            { text: task.evaluation, alignment: 'center' },
           ]
         }
         body.push(row)
@@ -137,10 +83,11 @@ function App() {
         style: 'tableExample',
         color: '#444',
         table: {
-          widths: ['auto', 'auto', 220, 'auto', 'auto', 'auto', 'auto'],
+          widths: ['*', 50, 'auto', '*', '*', 10],
           //headerRows: 1,
           keepWithHeaderRows: 1,
           body: body
+
         }
       },
     ]
@@ -164,16 +111,56 @@ function App() {
     const base64 = await convertBase64("/goose.jpg");
     return base64
   }
+
+  function getClassSelect(page: SchoolClass) {
+    const keys = Object.keys(SchoolClassTypes)
+    return (
+
+
+      <select name="classSelect" id={"classSelect" + page.id} >
+        {
+          keys.map((key, index) => {
+            //console.log(`key:${key} class:${page.schoolClass}`)
+            if (key === page.schoolClass.toUpperCase()) {
+              return (
+
+                <option selected value={key}>{key}</option>
+              )
+            }
+            else {
+              return (
+                <option value={key}>{key}</option>
+              )
+            }
+
+          })}
+      </select>
+    )
+  }
+
+  function getTasks(page: SchoolClass) {
+    return (<div>
+      {
+        getClassSelect(page)
+      }
+      {page.tasks.map(task => {
+        return <TaskInput task={task} />
+      })}
+      <button onClick={() => { addTask(page.id) }}>eine Aufgabe hinzufügen</button>
+    </div>
+    )
+  }
+
   return (
     <>
-      <h1>Das ist der Start</h1>
-      {firstTable.elements.map((page: SchoolClass) => {
-        return page.tasks.map(task => {
-          return <TaskInput task={task} />
-        })
 
+      {taskPerClass.map((page: SchoolClass) => {
+        return (
+          getTasks(page)
+        )
       }
       )}
+      <button onClick={() => { addClass() }}>Eine Fach hinzufügen</button>
       <div ref={ref} id="container"></div>
       <button onClick={generatePdf}> pdf gernerieren</button>
     </>
@@ -183,32 +170,16 @@ function App() {
 export default App
 
 /*
-[
-        {
-          style: 'tableExample',
-          color: '#444',
-          table: {
-            widths: [320, 'auto', 'auto'],
-            headerRows: 2,
-            // keepWithHeaderRows: 1,
-            body: [
-              [{ text: 'Header with Colspan = 2', style: 'tableHeader', colSpan: 2, alignment: 'center' }, {}, { text: 'Header 3', style: 'tableHeader', alignment: 'center' }],
-              [{ text: 'Header 1', style: 'tableHeader', alignment: 'center' }, { text: 'Header 2', style: 'tableHeader', alignment: 'center' }, { text: 'Header 3', style: 'tableHeader', alignment: 'center' }],
-              ['Sample value 1', 'Sample value 2', 'Sample value 3'],
-              [{ rowSpan: 3, text: 'rowSpan set to 3\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor' }, 'Sample value 2', 'Sample value 3'],
-              ['', 'Sample value 2 new line', 'Sample value 3 new line'],
-              ['Sample value 1 i am missing', 'Sample value 2', 'Sample value 3'],
-              [[{
-                image: image,
-                cover: { width: 100, height: 100 },
-              }, "test"], { colSpan: 2, rowSpan: 2, text: 'Both:\nrowSpan and colSpan\ncan be defined at the same time' }, ''],
-              [{
+lernbereich|was|aufgabe|wie|Kontrolle|fertig -> Reihenfolge PDF
 
-                image: image,
-                fit: [100, 100],
-              }, '', ''],
-            ]
-          }
-        },
-      ]
+[
+       onChange={(event) => {
+              let currentTask = Object.assign({}, task)
+              
+                      currentTask.control = event.currentTarget.value as TaskControl
+                  
+              }
+  
+              saveTask(currentTask)
+          }}
 */
