@@ -6,7 +6,7 @@ import { Page, SchoolClass, SchoolClassTypes, TaskCategory, TaskControl, TaskFor
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { v4 as uuid } from 'uuid';
 import TaskInput from './components/TaskInput';
-import { useTaskStore } from './states/TaskState';
+import { useTaskStore, WOCHENPLAN } from './states/TaskState';
 import './App.css'
 
 
@@ -15,6 +15,12 @@ import './App.css'
 function App() {
   const ref = useRef<HTMLDivElement>(null)
   const { taskPerClass, addTask, addClass, deleteClass, setClasses } = useTaskStore();
+
+  useEffect(() => {
+    const wochenplanStringified = localStorage.getItem(WOCHENPLAN)
+    wochenplanStringified ?
+      setClasses(JSON.parse(wochenplanStringified)) : null
+  }, [])
 
   const convertBase64 = async (file: String) => {
 
