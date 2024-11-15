@@ -5,19 +5,18 @@ export interface TaskInputProps {
     task: Task
 }
 export default function TaskInput({ task }: TaskInputProps) {
-    const { addTask, updateTasks, saveTask } = useTaskStore();
-
+    const { saveTask, deleteTasks } = useTaskStore();
 
 
     return (<div className="designer-grid">
         <div className="flex flex-row">
-            <input type="text" value={task.headline} onChange={(event) => {
+            <textarea value={task.headline} onChange={(event) => {
                 let currentTask = Object.assign({}, task)
                 currentTask.headline = event.currentTarget.value
                 saveTask(currentTask)
             }} />
 
-            <input type="text" value={task.subHeadline} onChange={(event) => {
+            <textarea value={task.subHeadline} onChange={(event) => {
                 let currentTask = Object.assign({}, task)
                 currentTask.subHeadline = event.currentTarget.value
                 saveTask(currentTask)
@@ -26,7 +25,7 @@ export default function TaskInput({ task }: TaskInputProps) {
         <TaskSelect selectType={TaskSelectType.FORM} task={task} selected={task.form} />
         <TaskSelect selectType={TaskSelectType.KATEGORIE} task={task} selected={task.category} />
         <TaskSelect selectType={TaskSelectType.KONTROLLE} task={task} selected={task.control} />
-
+        <button onClick={() => { deleteTasks(task.id) }}>Eine Aufgabe löschen</button>
     </div>)
 }
 
@@ -95,6 +94,8 @@ function getRealSelect(keys: string[], task: Task,
         </select>
     )
 }
+
+
 
 /*
  const keys = Object.keys(SchoolClassTypes)

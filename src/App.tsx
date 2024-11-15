@@ -14,7 +14,7 @@ import './App.css'
 
 function App() {
   const ref = useRef<HTMLDivElement>(null)
-  const { taskPerClass, addTask, addClass } = useTaskStore();
+  const { taskPerClass, addTask, addClass, deleteClass, setClasses } = useTaskStore();
 
   const convertBase64 = async (file: String) => {
 
@@ -95,7 +95,43 @@ function App() {
 
   }
 
+  function saveStateAsFile() {
+    const date = new Date()
+    // file setting
+    const text = JSON.stringify(taskPerClass);
+    const name = "Wochenplan" + date.getDate() + "." + date.getMonth() + "." + date.getFullYear() + ".json";
+    const type = "text/plain";
 
+    // create file
+    const a = document.createElement("a");
+    const file = new Blob([text], { type: type });
+    a.href = URL.createObjectURL(file);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+  }
+  function handleSubmit(event: any) {
+
+    event.preventDefault();
+    let files = event.target[0].files
+    console.log(event)
+    if (!files) return;
+
+    let reader = new FileReader();
+    reader.readAsText(files[0]);
+    reader.addEventListener(
+      "load",
+      () => {
+        reader.result && typeof reader.result == "string" ?
+          setClasses(JSON.parse(reader.result))
+          : null
+      },
+      false,
+    );
+
+  }
 
   const generatePdf = async () => {
 
@@ -147,13 +183,16 @@ function App() {
         return <TaskInput task={task} />
       })}
       <button onClick={() => { addTask(page.id) }}>eine Aufgabe hinzufügen</button>
+
+      <button onClick={() => { deleteClass(page.id) }}>Ein Fach löschen</button>
     </div>
     )
   }
 
+
   return (
     <>
-
+      <h1 className='text-center mb-2'>Wochenplan: </h1>
       {taskPerClass.map((page: SchoolClass) => {
         return (
           getTasks(page)
@@ -163,6 +202,13 @@ function App() {
       <button onClick={() => { addClass() }}>Eine Fach hinzufügen</button>
       <div ref={ref} id="container"></div>
       <button onClick={generatePdf}> pdf gernerieren</button>
+      <button onClick={saveStateAsFile}> Wochenplan speichern</button>
+      <h4>alten Wochenplan hochladen</h4>
+      <form id="upload" onSubmit={handleSubmit}>
+        <input type="file" id="file" accept=".json" />
+
+        <button>Upload</button>
+      </form>
     </>
   )
 }

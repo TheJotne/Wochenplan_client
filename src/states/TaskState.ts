@@ -8,8 +8,9 @@ interface TaskState {
     addClass: () => void;
     saveTask: (task: Task) => void
     updateTasks: (element: SchoolClass) => void
-    deleteTasks: (classId: string, taskId: string) => void
+    deleteTasks: (taskId: string) => void
     deleteClass: (classId: string) => void
+    setClasses: (clsses: SchoolClass[]) => void
 }
 
 
@@ -106,21 +107,29 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     },
     deleteClass: (classId: string) => {
         let pages = Array.from(get().taskPerClass)
-        /*   pages.forEach(page => {
-              if (page.id == classId) {
-                  
-              }
-          })
-          set({ taskPerClass: pages }) */
+        pages.forEach((page, index) => {
+            if ((page.id == classId)) {
+                pages.splice(index, 1)
+            }
+
+        })
+
+
+        set({ taskPerClass: pages })
     },
-    deleteTasks: (classId: string, taskId: string) => {
+    deleteTasks: (taskId: string) => {
         let pages = Array.from(get().taskPerClass)
-        /*  pages.forEach(page => {
-             if (page.id == pageId) {
-                 page.tasks.push(newTask)
-             }
-         })
-         set({ taskPerClass: pages }) */
+        pages.forEach((page, index1) => {
+            page.tasks.forEach((taskIterator, index2) => {
+                if (taskIterator.id == taskId) {
+                    page.tasks.splice(index2, 1)
+                }
+
+            })
+
+        })
+
+        set({ taskPerClass: pages })
     },
     saveTask: (task) => {
         let pages = Array.from(get().taskPerClass)
@@ -134,7 +143,10 @@ export const useTaskStore = create<TaskState>((set, get) => ({
             })
 
         })
-        console.log(pages)
+
         set({ taskPerClass: pages })
+    },
+    setClasses: (classes) => {
+        set({ taskPerClass: classes })
     }
 }))
