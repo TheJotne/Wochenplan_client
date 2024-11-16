@@ -2,9 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { Page, SchoolClass, SchoolClassTypes, TaskCategory, TaskControl, TaskForm } from './type/page';
+import { SchoolClass, SchoolClassTypes, TaskForm } from './type/page';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import { v4 as uuid } from 'uuid';
 import TaskInput from './components/TaskInput';
 import { useTaskStore, WOCHENPLAN } from './states/TaskState';
 import './App.css'
@@ -14,13 +13,7 @@ import './App.css'
 
 function App() {
   const ref = useRef<HTMLDivElement>(null)
-  const { taskPerClass, addTask, addClass, deleteClass, setClasses } = useTaskStore();
-
-  useEffect(() => {
-    const wochenplanStringified = localStorage.getItem(WOCHENPLAN)
-    wochenplanStringified ?
-      setClasses(JSON.parse(wochenplanStringified)) : null
-  }, [])
+  const { taskPerClass, addTask, addClass, deleteClass, setClasses, updateClass } = useTaskStore();
 
   const convertBase64 = async (file: String) => {
 
@@ -39,9 +32,41 @@ function App() {
       };
     });
   };
+  const generateBase64 = async (fileName: string) => {
+    const base64 = await convertBase64("./images/" + fileName + ".jpg");
+    return base64
+  }
+
+  let images: any
+  (async () => {
+    let images: Record<string, string> = {}
+    const schoolClassKeys = Object.values(SchoolClassTypes)
+    const TaskFormsKeys = Object.values(TaskForm)
+    schoolClassKeys.map(async (key, index) => {
+      const fileAsBase64 = await generateBase64(key)
+      images[key] = fileAsBase64 as string
+
+    })
+    TaskFormsKeys.map(async (key, index) => {
+      const fileAsBase64 = await generateBase64(key)
+      images[key] = fileAsBase64 as string
+    })
+    return await images;
+  })().then(record => {
+    images = record
+  })
+
+  useEffect(() => {
+    const wochenplanStringified = localStorage.getItem(WOCHENPLAN)
+    wochenplanStringified ?
+      setClasses(JSON.parse(wochenplanStringified)) : null
+  }, [])
+
+
 
   function generateTable(image: string) {
     let body: any = []
+    console.log(images)
     body.push(
       [
         { text: 'Lernbereich', style: 'tableHeader', colSpan: 1, alignment: 'center' },
@@ -53,13 +78,15 @@ function App() {
       ]
     )
     taskPerClass.map((schoolCLassElement) => {
+
       schoolCLassElement.tasks.map((task, index) => {
+        console.log(schoolCLassElement.schoolClass)
         let row
         if (index === 0) {
           row = [
 
             {
-              image: image,
+              image: images[schoolCLassElement.schoolClass],
               cover: { width: 70, height: 70 },
               rowSpan: schoolCLassElement.tasks.length
             },
@@ -90,7 +117,6 @@ function App() {
         color: '#444',
         table: {
           widths: ['*', 50, 'auto', '*', '*', 10],
-          //headerRows: 1,
           keepWithHeaderRows: 1,
           body: body
 
@@ -122,7 +148,6 @@ function App() {
 
     event.preventDefault();
     let files = event.target[0].files
-    console.log(event)
     if (!files) return;
 
     let reader = new FileReader();
@@ -141,7 +166,7 @@ function App() {
 
   const generatePdf = async () => {
 
-    const image: any = await generateBase64()
+    const image: any = await generateBase64("Deutsch")
 
     let docDefinition = {
       content: generateTable(image)
@@ -149,20 +174,19 @@ function App() {
 
     pdfMake.createPdf(docDefinition).open();
   }
-  const generateBase64 = async () => {
-    const base64 = await convertBase64("/goose.jpg");
-    return base64
-  }
 
   function getClassSelect(page: SchoolClass) {
-    const keys = Object.keys(SchoolClassTypes)
+    const keys = Object.values(SchoolClassTypes)
     return (
 
 
-      <select name="classSelect" id={"classSelect" + page.id} >
+      <select name="classSelect" id={"classSelect" + page.id} onChange={(event) => {
+        let classes = Object.assign({}, page)
+        classes.schoolClass = event.currentTarget.value as SchoolClassTypes
+        updateClass(classes)
+      }}>
         {
           keys.map((key, index) => {
-            //console.log(`key:${key} class:${page.schoolClass}`)
             if (key === page.schoolClass.toUpperCase()) {
               return (
 

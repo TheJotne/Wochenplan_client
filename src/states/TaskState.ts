@@ -6,6 +6,7 @@ interface TaskState {
     taskPerClass: SchoolClass[]
     addTask: (classId: string) => void;
     addClass: () => void;
+    updateClass: (element: SchoolClass) => void
     saveTask: (task: Task) => void
     updateTasks: (element: SchoolClass) => void
     deleteTasks: (taskId: string) => void
@@ -29,6 +30,22 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         pages.push(newClass)
         set({ taskPerClass: pages })
         localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
+    },
+    updateClass: (element) => {
+        let pages = Array.from(get().taskPerClass)
+        let newPages = pages.map(page => {
+            if (page.id == element.id) {
+                return element
+            }
+            else {
+                return page
+            }
+        })
+
+        console.log(newPages)
+        set({ taskPerClass: newPages })
+        localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
+
     },
     addTask: (pageId) => {
         let newTask: Task = {
@@ -111,53 +128,3 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         localStorage.setItem(WOCHENPLAN, JSON.stringify(classes));
     }
 }))
-
-/*
-{
-            schoolClass: SchoolClassTypes.DEUTSCH,
-
-            id: uuid(),
-            tasks: [
-                {
-                    id: uuid(),
-                    category: TaskCategory.PFLICHT,
-                    control: TaskControl.KEINE,
-                    evaluation: "",
-                    form: TaskForm.EINZEL,
-                    headline: "Das ist ein Test",
-                    subHeadline: "darunter",
-                    ready: false,
-                    symbol: "ein Bild"
-                },
-                {
-                    id: uuid(),
-                    category: TaskCategory.HA,
-                    control: TaskControl.ABGEBEN,
-                    evaluation: "",
-                    form: TaskForm.GRUPPE,
-                    headline: "Das ist ein Test",
-                    subHeadline: "darunter",
-                    ready: false,
-                    symbol: "ein Bild"
-                }
-            ]
-        },
-        {
-            schoolClass: SchoolClassTypes.KUNST,
-
-            id: uuid(),
-            tasks: [
-                {
-                    id: uuid(),
-                    category: TaskCategory.PFLICHT,
-                    control: TaskControl.KEINE,
-                    evaluation: "",
-                    form: TaskForm.EINZEL,
-                    headline: "Das ist ein Test",
-                    subHeadline: "darunter",
-                    ready: false,
-                    symbol: "ein Bild"
-                }
-            ]
-        }
-*/

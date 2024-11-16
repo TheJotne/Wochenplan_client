@@ -22,6 +22,7 @@ export enum SchoolClassTypes {
     MUSIK = "Musik",
     ERGÄNZUNG = "Ergänzung",
     PROJEKT = "Projekt",
+
 }
 export interface Task {
     id: string
