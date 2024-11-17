@@ -8,8 +8,8 @@ export default function TaskInput({ task }: TaskInputProps) {
     const { saveTask, deleteTasks } = useTaskStore();
 
 
-    return (<div className="designer-grid">
-        <div className="flex flex-row">
+    return (<div className="designer-grid px-4 m-auto">
+        <div className="flex flex-col">
             <textarea value={task.headline} onChange={(event) => {
                 let currentTask = Object.assign({}, task)
                 currentTask.headline = event.currentTarget.value
@@ -22,9 +22,9 @@ export default function TaskInput({ task }: TaskInputProps) {
                 saveTask(currentTask)
             }} />
         </div>
-        <TaskSelect selectType={TaskSelectType.FORM} task={task} selected={task.form} />
-        <TaskSelect selectType={TaskSelectType.KATEGORIE} task={task} selected={task.category} />
-        <TaskSelect selectType={TaskSelectType.KONTROLLE} task={task} selected={task.control} />
+        <TaskSelect selectType={TaskSelectType.Form} task={task} selected={task.form} />
+        <TaskSelect selectType={TaskSelectType.Kategorie} task={task} selected={task.category} />
+        <TaskSelect selectType={TaskSelectType.Kontrolle} task={task} selected={task.control} />
         <button onClick={() => { deleteTasks(task.id) }}>Eine Aufgabe löschen</button>
     </div>)
 }
@@ -37,17 +37,17 @@ export interface TaskSelectProps {
 export function TaskSelect({ selectType, task, selected }: TaskSelectProps) {
     const { saveTask } = useTaskStore();
     switch (selectType) {
-        case TaskSelectType.FORM: {
+        case TaskSelectType.Form: {
             const keys = Object.keys(TaskForm)
 
             return getRealSelect(keys, task, selected, saveTask, selectType)
         }
-        case TaskSelectType.KATEGORIE: {
+        case TaskSelectType.Kategorie: {
             const keys = Object.keys(TaskCategory)
 
             return getRealSelect(keys, task, selected, saveTask, selectType)
         }
-        case TaskSelectType.KONTROLLE: {
+        case TaskSelectType.Kontrolle: {
             const keys = Object.keys(TaskControl)
             return getRealSelect(keys, task, selected, saveTask, selectType)
         }
@@ -59,17 +59,17 @@ function getRealSelect(keys: string[], task: Task,
     selected: TaskForm | TaskCategory | TaskControl,
     saveTask: (task: Task) => void, selectType: TaskSelectType) {
     return (
-        <select name="ControlSelect" id={"ControlSelect" + task.id} onChange={(event) => {
+        <select name="ControlSelect" id={"ControlSelect" + task.id} className="max-h-[2rem]" onChange={(event) => {
             let currentTask = Object.assign({}, task)
             switch (selectType) {
-                case TaskSelectType.FORM: {
+                case TaskSelectType.Form: {
 
                     currentTask.form = event.currentTarget.value as TaskForm
                 }
-                case TaskSelectType.KATEGORIE: {
+                case TaskSelectType.Kategorie: {
                     currentTask.category = event.currentTarget.value as TaskCategory
                 }
-                case TaskSelectType.KONTROLLE: {
+                case TaskSelectType.Kontrolle: {
                     currentTask.control = event.currentTarget.value as TaskControl
                 }
             }

@@ -33,7 +33,7 @@ function App() {
     });
   };
   const generateBase64 = async (fileName: string) => {
-    const base64 = await convertBase64("./images/" + fileName + ".jpg");
+    const base64 = await convertBase64("./images/" + fileName + ".png");
     return base64
   }
 
@@ -92,7 +92,12 @@ function App() {
             },
             { text: task.category, alignment: 'center' },
             { text: task.headline + "\n" + task.subHeadline },
-            { text: task.form, alignment: 'center' },
+            {
+              image: images[task.form],
+              cover: { width: 70, height: 70 },
+              rowSpan: schoolCLassElement.tasks.length
+            },
+            /* { text: task.form, alignment: 'center' }, */
             { text: task.control, alignment: 'center' },
             { text: "", alignment: 'center' },
           ]
@@ -102,7 +107,11 @@ function App() {
             "",
             { text: task.category, alignment: 'center' },
             { text: task.headline + "\n" + task.subHeadline },
-            { text: task.form, alignment: 'center' },
+            {
+              image: images[task.form],
+              cover: { width: 70, height: 70 },
+              rowSpan: schoolCLassElement.tasks.length
+            },
             { text: task.control, alignment: 'center' },
             { text: "", alignment: 'center' },
           ]
@@ -176,18 +185,20 @@ function App() {
   }
 
   function getClassSelect(page: SchoolClass) {
-    const keys = Object.values(SchoolClassTypes)
+
+    const keys = Object.keys(SchoolClassTypes)
     return (
 
 
       <select name="classSelect" id={"classSelect" + page.id} onChange={(event) => {
         let classes = Object.assign({}, page)
         classes.schoolClass = event.currentTarget.value as SchoolClassTypes
+        console.log(classes)
         updateClass(classes)
       }}>
         {
           keys.map((key, index) => {
-            if (key === page.schoolClass.toUpperCase()) {
+            if (key === page.schoolClass) {
               return (
 
                 <option selected value={key}>{key}</option>
@@ -223,6 +234,10 @@ function App() {
   return (
     <>
       <h1 className='text-center mb-2'>Wochenplan: </h1>
+      <div className='flex gap-5 w-fit m-auto'>
+        <div className='fit-content'>von </div><input className='fit-content' type="date" id="wochenplanStart" name="wochenplanStart" />
+        <div className='fit-content'> bis </div><input className='fit-content' type="date" id="wochenplanEnd" name="wochenplanEnd" />
+      </div>
       {taskPerClass.map((page: SchoolClass) => {
         return (
           getTasks(page)

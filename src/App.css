@@ -1,7 +1,7 @@
 #root {
 
   margin: 0 auto;
-  padding: 2rem;
+
   text-align: center;
   width: 100%;
 }
@@ -47,5 +47,14 @@
 
 .designer-grid {
   display: grid;
-  grid-template-columns: repeat(5, 20% [col-start]);
+  grid-template-columns: repeat(5, 18% [col-start]);
+  gap: 1rem;
+}
+
+.fit-content {
+  width: fit-content;
+}
+
+textarea {
+  border-bottom: 2px solid rgb(87, 87, 87);
 }

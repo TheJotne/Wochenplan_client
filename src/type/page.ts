@@ -3,6 +3,7 @@ export interface Page {
     elements: SchoolClass[]
 }
 
+
 export interface SchoolClass {
     id: string
     schoolClass: SchoolClassTypes
@@ -10,18 +11,18 @@ export interface SchoolClass {
 }
 
 export enum SchoolClassTypes {
-    DEUTSCH = "Deutsch",
-    MATHE = "Mathe",
+    Deutsch = "Deutsch",
+    Mathe = "Mathe",
     HSK = "HSK",
-    KUNST = "Kunst",
-    ENGLISCH = "Englisch",
-    SPORT = "Sport",
-    FRANZÖSISCH = "Französisch",
-    SCHULGARTEN = "Schulgarten",
-    WERKEN = "Werken",
-    MUSIK = "Musik",
-    ERGÄNZUNG = "Ergänzung",
-    PROJEKT = "Projekt",
+    Kunst = "Kunst",
+    Englisch = "Englisch",
+    Sport = "Sport",
+    Französisch = "Französisch",
+    Schulgarten = "Schulgarten",
+    Werken = "Werken",
+    Musik = "Musik",
+    Ergänzung = "Ergänzung",
+    Projekt = "Projekt",
 
 }
 export interface Task {
@@ -37,25 +38,25 @@ export interface Task {
 }
 
 export enum TaskCategory {
-    PFLICHT = "pflicht",
-    ZUSATZ = "zusatz",
+    Pflicht = "Pflicht",
+    Zusatz = "Zusatz",
     HA = "HA"
 }
 export enum TaskForm {
-    EINZEL = "Einzeln",
-    PARTNER = "Partner",
-    GRUPPE = "Gruppe"
+    Einzeln = "Einzeln",
+    Partner = "Partner",
+    Gruppe = "Gruppe"
 }
 export enum TaskControl {
-    ABGEBEN = "Abgeben",
-    LÖSUNG = "Lösung",
-    MELDEN = "Melden",
-    KEINE = "Keine"
+    Abgeben = "Abgeben",
+    Lösung = "Lösung",
+    Melden = "Melden",
+    Keine = "Keine"
 }
 
 export enum TaskSelectType {
-    KATEGORIE = "Kategorie",
-    FORM = "Form",
-    KONTROLLE = "Kontrolle",
-    KLASSE = "Klasse"
+    Kategorie = "Kategorie",
+    Form = "Form",
+    Kontrolle = "Kontrolle",
+    Klasse = "Klasse"
 }

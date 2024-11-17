@@ -23,12 +23,13 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     addClass: () => {
         let newClass: SchoolClass = {
             id: uuid(),
-            schoolClass: SchoolClassTypes.DEUTSCH,
+            schoolClass: SchoolClassTypes.Ergänzung,
             tasks: []
         }
         let pages = get().taskPerClass
         pages.push(newClass)
         set({ taskPerClass: pages })
+        console.log(pages)
         localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
     },
     updateClass: (element) => {
@@ -42,9 +43,8 @@ export const useTaskStore = create<TaskState>((set, get) => ({
             }
         })
 
-        console.log(newPages)
         set({ taskPerClass: newPages })
-        localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
+        localStorage.setItem(WOCHENPLAN, JSON.stringify(newPages));
 
     },
     addTask: (pageId) => {
@@ -53,9 +53,9 @@ export const useTaskStore = create<TaskState>((set, get) => ({
             symbol: "",
             headline: "",
             subHeadline: "",
-            category: TaskCategory.PFLICHT,
-            form: TaskForm.EINZEL,
-            control: TaskControl.ABGEBEN,
+            category: TaskCategory.Pflicht,
+            form: TaskForm.Einzeln,
+            control: TaskControl.Abgeben,
             ready: false,
             evaluation: ""
         }
@@ -124,6 +124,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
     },
     setClasses: (classes) => {
+        console.log(classes)
         set({ taskPerClass: classes })
         localStorage.setItem(WOCHENPLAN, JSON.stringify(classes));
     }
