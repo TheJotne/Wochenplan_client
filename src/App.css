@@ -58,3 +58,31 @@
 textarea {
   border-bottom: 2px solid rgb(87, 87, 87);
 }
+
+.delete-or-add-button{
+  border-radius: 50%;
+  background-color: rgb(37, 37, 37);
+  color: white; 
+   width: 50px;
+  height: 50px;  
+  font-weight: bold;
+}
+.best-shadow{
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+select{
+  background-color: white;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  border-radius: 6px;
+}
+.delete-or-add-button_with-more-text{
+  border-radius: 30px;
+  background-color: rgb(37, 37, 37);
+  color: white; 
+  height: 50px;  
+  font-weight: bold;
+}
+.header{
+  
+  font-weight: bold;
+}

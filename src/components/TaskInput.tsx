@@ -8,7 +8,7 @@ export default function TaskInput({ task }: TaskInputProps) {
     const { saveTask, deleteTasks } = useTaskStore();
 
 
-    return (<div className="designer-grid px-4 m-auto">
+    return (<div className="designer-grid m-auto">
         <div className="flex flex-col">
             <textarea value={task.headline} onChange={(event) => {
                 let currentTask = Object.assign({}, task)
@@ -25,7 +25,7 @@ export default function TaskInput({ task }: TaskInputProps) {
         <TaskSelect selectType={TaskSelectType.Form} task={task} selected={task.form} />
         <TaskSelect selectType={TaskSelectType.Kategorie} task={task} selected={task.category} />
         <TaskSelect selectType={TaskSelectType.Kontrolle} task={task} selected={task.control} />
-        <button onClick={() => { deleteTasks(task.id) }}>Eine Aufgabe löschen</button>
+        <button className="delete-or-add-button ml-4" onClick={() => { deleteTasks(task.id) }}>-</button>
     </div>)
 }
 
@@ -65,12 +65,15 @@ function getRealSelect(keys: string[], task: Task,
                 case TaskSelectType.Form: {
 
                     currentTask.form = event.currentTarget.value as TaskForm
+                    break;
                 }
                 case TaskSelectType.Kategorie: {
                     currentTask.category = event.currentTarget.value as TaskCategory
+                    break;
                 }
                 case TaskSelectType.Kontrolle: {
                     currentTask.control = event.currentTarget.value as TaskControl
+                    break;
                 }
             }
 

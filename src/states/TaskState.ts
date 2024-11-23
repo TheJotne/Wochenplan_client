@@ -1,53 +1,103 @@
 import { create } from "zustand";
-import { SchoolClass, SchoolClassTypes, Task, TaskCategory, TaskControl, TaskForm } from "../type/page";
+import { Homework, HomeworkEnum, Page, SchoolClass, SchoolClassTypes, Task, TaskCategory, TaskControl, TaskForm } from "../type/page";
 import { v4 as uuid } from 'uuid';
 
 interface TaskState {
+    pages: Page[]
     taskPerClass: SchoolClass[]
+    from: Date
+    till: Date
+    addPage: () => void
+    deltePage: (pageNumber: number) => void
+    setCurrentPage: (pageNumber: number) => void
     addTask: (classId: string) => void;
     addClass: () => void;
     updateClass: (element: SchoolClass) => void
     saveTask: (task: Task) => void
-    updateTasks: (element: SchoolClass) => void
     deleteTasks: (taskId: string) => void
     deleteClass: (classId: string) => void
-    setClasses: (clsses: SchoolClass[]) => void
+    setPages: (clsses: Page[]) => void
+    addHomework: () => void;
+    setFrom: (date: Date) => void
+    setTill: (date: Date) => void
+    saveHomework: (homework: Homework) => void
+    deleteHomework: (homework: Homework) => void
+    currentPage: number
 }
 
 export const WOCHENPLAN = "Wochenplan"
 
 export const useTaskStore = create<TaskState>((set, get) => ({
-    taskPerClass: [
-
-    ],
+    from: new Date(),
+    till: new Date(),
+    currentPage: 0,
+    taskPerClass: [],
+    pages: [{
+        elements: [],
+        homeworks: [],
+        pageNumber: 0
+    }],
+    addPage: () => {
+        let pages = Array.from(get().pages)
+        let newPos = pages.length
+        pages.push({
+            elements: [],
+            homeworks: [],
+            pageNumber: pages.length
+        })
+        set({ pages: pages })
+        localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
+    },
+    deltePage: (pageNumber) => {
+        let pages = Array.from(get().pages)
+        let oldCurrntPage = get().currentPage
+        pages.forEach((page, index) => {
+            if ((index == pageNumber)) {
+                pages.splice(index, 1)
+            }
+        })
+        console.log(pages)
+        set({ pages: pages })
+        set({ currentPage: oldCurrntPage - 1 })
+        localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
+    },
+    setCurrentPage: (pageNumber) => {
+        set({ currentPage: pageNumber })
+    },
     addClass: () => {
         let newClass: SchoolClass = {
             id: uuid(),
             schoolClass: SchoolClassTypes.Ergänzung,
             tasks: []
         }
-        let pages = get().taskPerClass
-        pages.push(newClass)
-        set({ taskPerClass: pages })
-        console.log(pages)
+
+        let page = Object.assign({}, get().pages[get().currentPage])
+        page.elements.push(newClass)
+        let pages = Array.from(get().pages)
+        pages[get().currentPage] = page
+        set({ pages: pages })
         localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
     },
     updateClass: (element) => {
-        let pages = Array.from(get().taskPerClass)
-        let newPages = pages.map(page => {
-            if (page.id == element.id) {
+        let page = Object.assign({}, get().pages[get().currentPage])
+        //let schoolclasses = page.elements
+        let newClassUpdate = page.elements.map(schoolclass => {
+            if (schoolclass.id == element.id) {
                 return element
             }
             else {
-                return page
+                return schoolclass
             }
         })
 
-        set({ taskPerClass: newPages })
-        localStorage.setItem(WOCHENPLAN, JSON.stringify(newPages));
+        let pages = Array.from(get().pages)
+        page.elements = newClassUpdate
+        pages[get().currentPage] = page
+        set({ pages: pages })
+        localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
 
     },
-    addTask: (pageId) => {
+    addTask: (classId) => {
         let newTask: Task = {
             id: uuid(),
             symbol: "",
@@ -59,73 +109,123 @@ export const useTaskStore = create<TaskState>((set, get) => ({
             ready: false,
             evaluation: ""
         }
-        let pages = Array.from(get().taskPerClass)
-        pages.forEach(page => {
-            if (page.id == pageId) {
+
+        let page = Object.assign({}, get().pages[get().currentPage])
+
+        page.elements.forEach(page => {
+            if (page.id == classId) {
                 page.tasks.push(newTask)
             }
         })
-        set({ taskPerClass: pages })
+        let pages = Array.from(get().pages)
+        pages[get().currentPage] = page
+        set({ pages: pages })
         localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
-    },
-    updateTasks: (element) => {
-        let pages = Array.from(get().taskPerClass)
-        pages.forEach(page => {
-            if (page.id == element.id) {
-                page = element
-            }
-        })
-        set({ taskPerClass: pages })
-        localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
-
     },
     deleteClass: (classId: string) => {
-        let pages = Array.from(get().taskPerClass)
-        pages.forEach((page, index) => {
-            if ((page.id == classId)) {
-                pages.splice(index, 1)
+        let page = Object.assign({}, get().pages[get().currentPage])
+
+        page.elements.forEach((task, index) => {
+            if ((task.id == classId)) {
+                page.elements.splice(index, 1)
             }
 
         })
-
-
-        set({ taskPerClass: pages })
+        let pages = Array.from(get().pages)
+        pages[get().currentPage] = page
+        set({ pages: pages })
         localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
     },
     deleteTasks: (taskId: string) => {
-        let pages = Array.from(get().taskPerClass)
-        pages.forEach((page, index1) => {
-            page.tasks.forEach((taskIterator, index2) => {
+        let page = Object.assign({}, get().pages[get().currentPage])
+
+        page.elements.forEach((schoolclass, index1) => {
+            schoolclass.tasks.forEach((taskIterator, index2) => {
                 if (taskIterator.id == taskId) {
-                    page.tasks.splice(index2, 1)
+                    schoolclass.tasks.splice(index2, 1)
                 }
 
             })
 
         })
 
-        set({ taskPerClass: pages })
+        let pages = Array.from(get().pages)
+        pages[get().currentPage] = page
+        set({ pages: pages })
         localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
     },
     saveTask: (task) => {
-        let pages = Array.from(get().taskPerClass)
-
-        pages.forEach((page, index) => {
-            page.tasks.forEach((taskIterator, index) => {
+        let page = Object.assign({}, get().pages[get().currentPage])
+        page.elements.forEach((scoolClassElements, index1) => {
+            scoolClassElements.tasks.forEach((taskIterator, index2) => {
                 if (taskIterator.id == task.id) {
-                    page.tasks[index] = task
+                    scoolClassElements.tasks[index2] = task
                 }
-
             })
-
         })
-
-        set({ taskPerClass: pages })
+        let pages = Array.from(get().pages)
+        pages[get().currentPage] = page
+        set({ pages: pages })
         localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
     },
-    setClasses: (classes) => {
-        console.log(classes)
-        set({ taskPerClass: classes })
-        localStorage.setItem(WOCHENPLAN, JSON.stringify(classes));
-    }
+    setPages: (oldPages) => {
+        let pages = Array.from(get().pages)
+        pages = oldPages
+        set({ pages: pages })
+
+        localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
+    },
+    addHomework: () => {
+        let newHomework: Homework = {
+            id: uuid(),
+            class: SchoolClassTypes.Deutsch,
+            date: HomeworkEnum.BIS_DIENSTAG,
+            description: ""
+        }
+
+        let page = Object.assign({}, get().pages[get().currentPage])
+
+
+        page.homeworks.push(newHomework)
+        let pages = Array.from(get().pages)
+        pages[get().currentPage] = page
+        set({ pages: pages })
+        localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
+    },
+    saveHomework: (homework) => {
+
+        let page = Object.assign({}, get().pages[get().currentPage])
+
+        page.homeworks.forEach((homeworkIterator, index) => {
+            if (homeworkIterator.id == homework.id) {
+                page.homeworks[index] = homework
+            }
+        })
+        let pages = Array.from(get().pages)
+        pages[get().currentPage] = page
+        set({ pages: pages })
+        localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
+
+    },
+    deleteHomework: (homework) => {
+
+        let page = Object.assign({}, get().pages[get().currentPage])
+
+        page.homeworks.forEach((homeworkIterator, index) => {
+            if (homeworkIterator.id == homework.id) {
+                page.homeworks.splice(index, 1)
+            }
+        })
+        let pages = Array.from(get().pages)
+        pages[get().currentPage] = page
+        set({ pages: pages })
+        localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
+
+    },
+    setFrom(date) {
+        set({ from: date })
+    },
+    setTill(date) {
+        set({ till: date })
+    },
 }))

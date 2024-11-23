@@ -1,8 +1,15 @@
 export interface Page {
     pageNumber: number,
     elements: SchoolClass[]
+    homeworks: Homework[]
 }
+export interface Homework {
+    id: string
+    date: HomeworkEnum
+    class: SchoolClassTypes
+    description: string
 
+}
 
 export interface SchoolClass {
     id: string
@@ -60,3 +67,11 @@ export enum TaskSelectType {
     Kontrolle = "Kontrolle",
     Klasse = "Klasse"
 }
+
+
+export enum HomeworkEnum {
+    BIS_DIENSTAG = "bis Dienstag",
+    BIS_MITTWOCH = "bis Mittwoch",
+    BIS_DONNERSTAG = "bis Donnerstag",
+}
+

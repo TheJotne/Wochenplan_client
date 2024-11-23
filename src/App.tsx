@@ -4,16 +4,18 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { SchoolClass, SchoolClassTypes, TaskForm } from './type/page';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import TaskInput from './components/TaskInput';
 import { useTaskStore, WOCHENPLAN } from './states/TaskState';
 import './App.css'
+import PageView from './components/PageView';
+import PageHeaderView from './components/PageHeaderView';
+import HomeworkView from './components/HomeworkView';
 
 
 
 
 function App() {
   const ref = useRef<HTMLDivElement>(null)
-  const { taskPerClass, addTask, addClass, deleteClass, setClasses, updateClass } = useTaskStore();
+  const { pages, currentPage, addPage, deltePage, setCurrentPage, addClass, deleteClass, setPages, updateClass, from, till, setFrom, setTill } = useTaskStore();
 
   const convertBase64 = async (file: String) => {
 
@@ -58,15 +60,15 @@ function App() {
 
   useEffect(() => {
     const wochenplanStringified = localStorage.getItem(WOCHENPLAN)
+    //wochenplanStringified ? console.log(JSON.parse(wochenplanStringified)) : null
     wochenplanStringified ?
-      setClasses(JSON.parse(wochenplanStringified)) : null
+      setPages(JSON.parse(wochenplanStringified)) : null
   }, [])
 
 
 
-  function generateTable(image: string) {
+  function generateTable(pageNumber: number) {
     let body: any = []
-    console.log(images)
     body.push(
       [
         { text: 'Lernbereich', style: 'tableHeader', colSpan: 1, alignment: 'center' },
@@ -77,7 +79,7 @@ function App() {
         { text: '✔', style: 'tableHeader', colSpan: 1, alignment: 'center' }
       ]
     )
-    taskPerClass.map((schoolCLassElement) => {
+    pages[pageNumber].elements.map((schoolCLassElement) => {
 
       schoolCLassElement.tasks.map((task, index) => {
         console.log(schoolCLassElement.schoolClass)
@@ -87,17 +89,16 @@ function App() {
 
             {
               image: images[schoolCLassElement.schoolClass],
-              cover: { width: 70, height: 70 },
+              cover: { width: 70, height: 70 }, alignment: 'center',
               rowSpan: schoolCLassElement.tasks.length
             },
             { text: task.category, alignment: 'center' },
             { text: task.headline + "\n" + task.subHeadline },
             {
               image: images[task.form],
-              cover: { width: 70, height: 70 },
-              rowSpan: schoolCLassElement.tasks.length
+              cover: { width: 70, height: 70 }, alignment: 'center',
+              //rowSpan: schoolCLassElement.tasks.length
             },
-            /* { text: task.form, alignment: 'center' }, */
             { text: task.control, alignment: 'center' },
             { text: "", alignment: 'center' },
           ]
@@ -109,8 +110,8 @@ function App() {
             { text: task.headline + "\n" + task.subHeadline },
             {
               image: images[task.form],
-              cover: { width: 70, height: 70 },
-              rowSpan: schoolCLassElement.tasks.length
+              cover: { width: 70, height: 70 }, alignment: 'center',
+              //rowSpan: schoolCLassElement.tasks.length
             },
             { text: task.control, alignment: 'center' },
             { text: "", alignment: 'center' },
@@ -136,10 +137,25 @@ function App() {
 
   }
 
+  function generateHomeworkList(pageNumber: number) {
+    let body: any = []
+
+    pages[pageNumber].homeworks.map(homework => {
+
+      body.push(homework.date + "    " + homework.class + "    " + homework.description)
+    })
+    return { ol: body }
+
+  }
+
+
+
+
+
   function saveStateAsFile() {
     const date = new Date()
     // file setting
-    const text = JSON.stringify(taskPerClass);
+    const text = JSON.stringify(pages);
     const name = "Wochenplan" + date.getDate() + "." + date.getMonth() + "." + date.getFullYear() + ".json";
     const type = "text/plain";
 
@@ -165,86 +181,84 @@ function App() {
       "load",
       () => {
         reader.result && typeof reader.result == "string" ?
-          setClasses(JSON.parse(reader.result))
+          setPages(JSON.parse(reader.result))
           : null
       },
       false,
     );
 
   }
+  function generateUseFullDate(date: Date) {
+    return "" + date.getDay() + "." + date.getMonth() + "." + date.getFullYear()
+  }
 
   const generatePdf = async () => {
 
     const image: any = await generateBase64("Deutsch")
+    let completeContent: any = [
+
+    ]
+    pages.map((page, index) => {
+      completeContent.push({ text: 'Wochenplan  ' + generateUseFullDate(from) + " bis " + generateUseFullDate(till), style: 'header' },)
+      completeContent.push(generateTable(index))
+      completeContent.push(generateHomeworkList(index))
+      if (pages.length - 1 != index) {
+        completeContent.push({ text: 'Seite  ' + (index + 1), pageBreak: 'after' })
+      }
+    })
 
     let docDefinition = {
-      content: generateTable(image)
+      content: completeContent,
+      styles: {
+        header: {
+          bold: true,
+          fontSize: 15
+        }
+      }
+      /* [
+        { text: 'Wochenplan  ' + generateUseFullDate(from) + " bis " + generateUseFullDate(till), style: 'header' },
+
+        generateTable(image)
+      ] */
     }
 
     pdfMake.createPdf(docDefinition).open();
   }
 
-  function getClassSelect(page: SchoolClass) {
 
-    const keys = Object.keys(SchoolClassTypes)
-    return (
-
-
-      <select name="classSelect" id={"classSelect" + page.id} onChange={(event) => {
-        let classes = Object.assign({}, page)
-        classes.schoolClass = event.currentTarget.value as SchoolClassTypes
-        console.log(classes)
-        updateClass(classes)
-      }}>
-        {
-          keys.map((key, index) => {
-            if (key === page.schoolClass) {
-              return (
-
-                <option selected value={key}>{key}</option>
-              )
-            }
-            else {
-              return (
-                <option value={key}>{key}</option>
-              )
-            }
-
-          })}
-      </select>
-    )
-  }
-
-  function getTasks(page: SchoolClass) {
-    return (<div>
-      {
-        getClassSelect(page)
-      }
-      {page.tasks.map(task => {
-        return <TaskInput task={task} />
-      })}
-      <button onClick={() => { addTask(page.id) }}>eine Aufgabe hinzufügen</button>
-
-      <button onClick={() => { deleteClass(page.id) }}>Ein Fach löschen</button>
-    </div>
-    )
-  }
 
 
   return (
     <>
       <h1 className='text-center mb-2'>Wochenplan: </h1>
       <div className='flex gap-5 w-fit m-auto'>
-        <div className='fit-content'>von </div><input className='fit-content' type="date" id="wochenplanStart" name="wochenplanStart" />
-        <div className='fit-content'> bis </div><input className='fit-content' type="date" id="wochenplanEnd" name="wochenplanEnd" />
+        <div className='fit-content'>von </div><input className='fit-content' type="date" id="wochenplanStart" name="wochenplanStart" value={from.toISOString().substr(0, 10)} onChange={(e) => {
+          if (e.target.valueAsNumber)
+            setFrom(new Date(e.target.valueAsNumber))
+
+        }} />
+        <div className='fit-content'> bis </div><input className='fit-content' type="date" id="wochenplanEnd" name="wochenplanEnd" value={till.toISOString().substr(0, 10)}
+          onChange={(e) => {
+            if (e.target.valueAsNumber)
+              setTill(new Date(e.target.valueAsNumber))
+
+          }} />
       </div>
-      {taskPerClass.map((page: SchoolClass) => {
-        return (
-          getTasks(page)
-        )
-      }
-      )}
-      <button onClick={() => { addClass() }}>Eine Fach hinzufügen</button>
+      <div className='flex flex-col'>
+        <div className='flex flex-row'>
+          {pages.map((page, index) => {
+            return <PageHeaderView page={page} index={index} />
+          })}
+
+        </div>
+        <PageView />
+
+        <button className='delete-or-add-button_with-more-text w-fit ml-6' onClick={() => { addClass() }}>+ Fach</button>
+        <HomeworkView />
+      </div>
+
+
+
       <div ref={ref} id="container"></div>
       <button onClick={generatePdf}> pdf gernerieren</button>
       <button onClick={saveStateAsFile}> Wochenplan speichern</button>
@@ -260,17 +274,3 @@ function App() {
 
 export default App
 
-/*
-lernbereich|was|aufgabe|wie|Kontrolle|fertig -> Reihenfolge PDF
-
-[
-       onChange={(event) => {
-              let currentTask = Object.assign({}, task)
-              
-                      currentTask.control = event.currentTarget.value as TaskControl
-                  
-              }
-  
-              saveTask(currentTask)
-          }}
-*/
