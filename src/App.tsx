@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
 
 import pdfMake from "pdfmake/build/pdfmake";
-//import { default as pdfFonts } from "pdfmake/build/vfs_fonts";
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+
 import { SchoolClassTypes, TaskForm } from './type/page';
-//pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { useTaskStore, WOCHENPLAN } from './states/TaskState';
 import './App.css'
 import PageView from './components/PageView';
@@ -34,8 +35,8 @@ function App() {
       };
     });
   };
-  const generateBase64 = async (fileName: string, type: string = "png") => {
-    const base64 = await convertBase64("./images/" + fileName + "." + type);
+  const generateBase64 = async (fileName: string) => {
+    const base64 = await convertBase64("./images/" + fileName + ".png");
     return base64
   }
 
@@ -88,7 +89,6 @@ function App() {
     pages[pageNumber].elements.map((schoolCLassElement) => {
 
       schoolCLassElement.tasks.map((task, index) => {
-        console.log(schoolCLassElement.schoolClass)
         let row
         if (index === 0) {
           row = [
