@@ -34,8 +34,8 @@ function App() {
       };
     });
   };
-  const generateBase64 = async (fileName: string) => {
-    const base64 = await convertBase64("./images/" + fileName + ".png");
+  const generateBase64 = async (fileName: string, type: string = "png") => {
+    const base64 = await convertBase64("./images/" + fileName + "." + type);
     return base64
   }
 
@@ -53,6 +53,8 @@ function App() {
       const fileAsBase64 = await generateBase64(key)
       images[key] = fileAsBase64 as string
     })
+    const fileAsBase64 = await generateBase64("check")
+    images["check"] = fileAsBase64 as string
     return await images;
   })().then(record => {
     images = record
@@ -76,8 +78,12 @@ function App() {
         { text: 'Aufgaben', style: 'tableHeader', colSpan: 1, alignment: 'center' },
         { text: 'Wie?', style: 'tableHeader', colSpan: 1, alignment: 'center' },
         { text: 'Kontrolle', style: 'tableHeader', colSpan: 1, alignment: 'center' },
-        { text: '✔', style: 'tableHeader', colSpan: 1, alignment: 'center' }
-      ]
+        {
+          image: images["check"],
+          cover: { width: 20, height: 20 }, alignment: 'center',
+        }
+        //{ text: '✔', style: 'tableHeader', colSpan: 1, alignment: 'center' }
+      ]//check
     )
     pages[pageNumber].elements.map((schoolCLassElement) => {
 
@@ -96,7 +102,7 @@ function App() {
             { text: task.headline + "\n" + task.subHeadline },
             {
               image: images[task.form],
-              cover: { width: 70, height: 70 }, alignment: 'center',
+              cover: { width: 50, height: 50 }, alignment: 'center',
               //rowSpan: schoolCLassElement.tasks.length
             },
             { text: task.control, alignment: 'center' },
@@ -110,7 +116,7 @@ function App() {
             { text: task.headline + "\n" + task.subHeadline },
             {
               image: images[task.form],
-              cover: { width: 70, height: 70 }, alignment: 'center',
+              cover: { width: 50, height: 50 }, alignment: 'center',
               //rowSpan: schoolCLassElement.tasks.length
             },
             { text: task.control, alignment: 'center' },
@@ -199,11 +205,26 @@ function App() {
 
     ]
     pages.map((page, index) => {
-      completeContent.push({ text: 'Wochenplan  ' + generateUseFullDate(from) + " bis " + generateUseFullDate(till), style: 'header' },)
+      completeContent.push({ text: 'Wochenplan  ' + generateUseFullDate(from) + " bis " + generateUseFullDate(till), style: 'header', margin: [5, 2, 10, 20] })
       completeContent.push(generateTable(index))
+      completeContent.push({ text: 'Erledigt am:  ', style: 'header', margin: [5, 10, 10, 10] })
+      completeContent.push({
+        canvas:
+          [
+            {
+              type: 'line',
+              x1: 0, y1: 20,
+              x2: 260, y2: 20,
+              lineWidth: 1
+            },
+
+          ]
+      }),
+
+        completeContent.push({ text: 'Hausaufgaben:  ', style: 'header', margin: [5, 10, 10, 20] })
       completeContent.push(generateHomeworkList(index))
       if (pages.length - 1 != index) {
-        completeContent.push({ text: 'Seite  ' + (index + 1), pageBreak: 'after' })
+        completeContent.push({ text: '', pageBreak: 'after' })
       }
     })
 

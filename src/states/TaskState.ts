@@ -58,7 +58,6 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         })
         console.log(pages)
         set({ pages: pages })
-        set({ currentPage: oldCurrntPage - 1 })
         localStorage.setItem(WOCHENPLAN, JSON.stringify(pages));
     },
     setCurrentPage: (pageNumber) => {
