@@ -277,14 +277,24 @@ function App() {
 
 
       <div ref={ref} id="container"></div>
-      <button onClick={generatePdf}> pdf gernerieren</button>
-      <button onClick={saveStateAsFile}> Wochenplan speichern</button>
-      <h4>alten Wochenplan hochladen</h4>
-      <form id="upload" onSubmit={handleSubmit}>
-        <input type="file" id="file" accept=".json" />
+      <div className='flex flex-col m-auto justify-center w-fit mb-8'>
+        <button onClick={generatePdf} className='delete-or-add-button_with-more-text w-fit m-auto'> pdf generieren</button>
+        <button onClick={saveStateAsFile} className='delete-or-add-button_with-more-text w-fit m-auto my-4'> Wochenplan speichern</button>
 
-        <button>Upload</button>
-      </form>
+        <h4 className='font-bold mt-4'>alten Wochenplan hochladen</h4>
+        <div className='flex flex-row w-fit mt-4 '>
+
+          <div>
+
+            <form id="upload" onSubmit={handleSubmit}>
+              <input type="file" id="file" accept=".json" />
+
+              <button className='delete-or-add-button_with-more-text w-fit ml-6'>Upload</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
     </>
   )
 }
