@@ -195,7 +195,8 @@ function App() {
 
   }
   function generateUseFullDate(date: Date) {
-    return "" + date.getDay() + "." + date.getMonth() + "." + date.getFullYear()
+    console.log(date)
+    return "" + date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear()
   }
 
   const generatePdf = async () => {
@@ -205,9 +206,9 @@ function App() {
 
     ]
     pages.map((page, index) => {
-      completeContent.push({ text: 'Wochenplan  ' + generateUseFullDate(from) + " bis " + generateUseFullDate(till), style: 'header', margin: [5, 2, 10, 20] })
+      completeContent.push({ text: 'Wochenplan  ' + generateUseFullDate(from) + " bis " + generateUseFullDate(till), style: 'header', margin: [0, 2, 10, 20] })
       completeContent.push(generateTable(index))
-      completeContent.push({ text: 'Erledigt am:  ', style: 'header', margin: [5, 10, 10, 10] })
+      completeContent.push({ text: 'Erledigt am:  ', style: 'header', margin: [0, 10, 10, 10] })
       completeContent.push({
         canvas:
           [
@@ -221,7 +222,7 @@ function App() {
           ]
       }),
 
-        completeContent.push({ text: 'Hausaufgaben:  ', style: 'header', margin: [5, 10, 10, 20] })
+        completeContent.push({ text: 'Hausaufgaben:  ', style: 'header', margin: [0, 10, 10, 20] })
       completeContent.push(generateHomeworkList(index))
       if (pages.length - 1 != index) {
         completeContent.push({ text: '', pageBreak: 'after' })
@@ -236,11 +237,6 @@ function App() {
           fontSize: 15
         }
       }
-      /* [
-        { text: 'Wochenplan  ' + generateUseFullDate(from) + " bis " + generateUseFullDate(till), style: 'header' },
-
-        generateTable(image)
-      ] */
     }
 
     pdfMake.createPdf(docDefinition).open();
