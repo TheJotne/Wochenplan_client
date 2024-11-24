@@ -1,16 +1,25 @@
 import { useEffect, useRef } from 'react'
 
 import pdfMake from "pdfmake/build/pdfmake";
-import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+//import pdfFonts from 'pdfmake/build/vfs_fonts';
 
 import { SchoolClassTypes, TaskForm } from './type/page';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { useTaskStore, WOCHENPLAN } from './states/TaskState';
 import './App.css'
 import PageView from './components/PageView';
 import PageHeaderView from './components/PageHeaderView';
 import HomeworkView from './components/HomeworkView';
 
+pdfMake.vfs = {};
+pdfMake.fonts = {
+  Roboto: {
+    normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
+    bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
+    italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
+    bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
+  },
+};
 
 
 
