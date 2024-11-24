@@ -80,7 +80,7 @@ function getRealSelect(keys: string[], task: Task,
             saveTask(currentTask)
         }}>
             {
-                keys.map((key, index) => {
+                keys.map((key) => {
                     if (key === selected) {
                         return (
 

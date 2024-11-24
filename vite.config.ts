@@ -9,6 +9,12 @@ export default defineConfig({
     postcss: {
       plugins: [tailwindcss()],
     },
+  },
+  build: {
+    commonjsOptions: {
+      exclude: ['pdfmake/*', "pdfFonts/*"],
+    },
   }
 
 })
+

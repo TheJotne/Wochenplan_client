@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
-import { SchoolClass, SchoolClassTypes, TaskForm } from './type/page';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+//import { default as pdfFonts } from "pdfmake/build/vfs_fonts";
+import { SchoolClassTypes, TaskForm } from './type/page';
+//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { useTaskStore, WOCHENPLAN } from './states/TaskState';
 import './App.css'
 import PageView from './components/PageView';
@@ -15,7 +15,7 @@ import HomeworkView from './components/HomeworkView';
 
 function App() {
   const ref = useRef<HTMLDivElement>(null)
-  const { pages, currentPage, addPage, deltePage, setCurrentPage, addClass, deleteClass, setPages, updateClass, from, till, setFrom, setTill } = useTaskStore();
+  const { pages, addClass, setPages, from, till, setFrom, setTill } = useTaskStore();
 
   const convertBase64 = async (file: String) => {
 
@@ -44,12 +44,12 @@ function App() {
     let images: Record<string, string> = {}
     const schoolClassKeys = Object.values(SchoolClassTypes)
     const TaskFormsKeys = Object.values(TaskForm)
-    schoolClassKeys.map(async (key, index) => {
+    schoolClassKeys.map(async (key) => {
       const fileAsBase64 = await generateBase64(key)
       images[key] = fileAsBase64 as string
 
     })
-    TaskFormsKeys.map(async (key, index) => {
+    TaskFormsKeys.map(async (key) => {
       const fileAsBase64 = await generateBase64(key)
       images[key] = fileAsBase64 as string
     })
@@ -201,11 +201,12 @@ function App() {
 
   const generatePdf = async () => {
 
-    const image: any = await generateBase64("Deutsch")
+
     let completeContent: any = [
 
     ]
     pages.map((page, index) => {
+      console.log(page)
       completeContent.push({ text: 'Wochenplan  ' + generateUseFullDate(from) + " bis " + generateUseFullDate(till), style: 'header', margin: [0, 2, 10, 20] })
       completeContent.push(generateTable(index))
       completeContent.push({ text: 'Erledigt am:  ', style: 'header', margin: [0, 10, 10, 10] })

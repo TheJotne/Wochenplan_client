@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/homeworkinput.tsx","./src/components/homeworkview.tsx","./src/components/pageheaderview.tsx","./src/components/pageview.tsx","./src/components/schoolclassview.tsx","./src/components/taskinput.tsx","./src/states/taskstate.ts","./src/type/page.ts"],"version":"5.6.3"}

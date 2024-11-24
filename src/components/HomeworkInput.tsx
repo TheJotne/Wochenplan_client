@@ -1,5 +1,5 @@
 import { useTaskStore } from "../states/TaskState";
-import { Homework, HomeworkEnum, SchoolClassTypes, Task, TaskCategory, TaskControl, TaskForm, TaskSelectType } from "../type/page";
+import { Homework, HomeworkEnum, SchoolClassTypes } from "../type/page";
 
 export interface HomeworkInputProps {
     homework: Homework
@@ -24,7 +24,7 @@ export default function HomeworkInput({ homework }: HomeworkInputProps) {
             }}>
                 {
 
-                    Object.values(HomeworkEnum).map((key, index) => {
+                    Object.values(HomeworkEnum).map((key) => {
                         if (key === homework.date) {
                             return (
 
@@ -47,7 +47,7 @@ export default function HomeworkInput({ homework }: HomeworkInputProps) {
             }}>
                 {
 
-                    Object.values(SchoolClassTypes).map((key, index) => {
+                    Object.values(SchoolClassTypes).map((key) => {
                         if (key === homework.class) {
                             return (
 

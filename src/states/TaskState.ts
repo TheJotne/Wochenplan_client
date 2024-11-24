@@ -39,7 +39,6 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     }],
     addPage: () => {
         let pages = Array.from(get().pages)
-        let newPos = pages.length
         pages.push({
             elements: [],
             homeworks: [],
@@ -50,8 +49,9 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     },
     deltePage: (pageNumber) => {
         let pages = Array.from(get().pages)
-        let oldCurrntPage = get().currentPage
-        pages.forEach((page, index) => {
+
+        pages.forEach((_page, index) => {
+
             if ((index == pageNumber)) {
                 pages.splice(index, 1)
             }
@@ -138,7 +138,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     deleteTasks: (taskId: string) => {
         let page = Object.assign({}, get().pages[get().currentPage])
 
-        page.elements.forEach((schoolclass, index1) => {
+        page.elements.forEach((schoolclass) => {
             schoolclass.tasks.forEach((taskIterator, index2) => {
                 if (taskIterator.id == taskId) {
                     schoolclass.tasks.splice(index2, 1)
@@ -155,7 +155,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     },
     saveTask: (task) => {
         let page = Object.assign({}, get().pages[get().currentPage])
-        page.elements.forEach((scoolClassElements, index1) => {
+        page.elements.forEach((scoolClassElements) => {
             scoolClassElements.tasks.forEach((taskIterator, index2) => {
                 if (taskIterator.id == task.id) {
                     scoolClassElements.tasks[index2] = task

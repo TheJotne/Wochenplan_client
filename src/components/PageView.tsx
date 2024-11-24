@@ -1,13 +1,12 @@
 import { useTaskStore } from "../states/TaskState";
-import { Page, SchoolClass, SchoolClassTypes } from "../type/page"
+import { Page, SchoolClass } from "../type/page"
 import SchoolClassView from "./SchoolClassView";
-import TaskInput from "./TaskInput";
 
 export interface PageViewViewProps {
     page?: Page
 }
-export default function PageView({ page }: PageViewViewProps) {
-    const { pages, deltePage, setCurrentPage, currentPage, addPage } = useTaskStore();
+export default function PageView({ }: PageViewViewProps) {
+    const { pages, currentPage } = useTaskStore();
 
 
     return (
