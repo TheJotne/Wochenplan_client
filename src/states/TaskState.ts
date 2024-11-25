@@ -7,6 +7,8 @@ interface TaskState {
     taskPerClass: SchoolClass[]
     from: Date
     till: Date
+    headline: string | null
+    setHeadline: (newHeadline: string) => void
     addPage: () => void
     deltePage: (pageNumber: number) => void
     setCurrentPage: (pageNumber: number) => void
@@ -26,8 +28,10 @@ interface TaskState {
 }
 
 export const WOCHENPLAN = "Wochenplan"
+export const HEADLINE = "headline"
 
 export const useTaskStore = create<TaskState>((set, get) => ({
+    headline: localStorage.getItem(HEADLINE) != null ? localStorage.getItem(HEADLINE) : "Wochenplan: ",
     from: new Date(),
     till: new Date(),
     currentPage: 0,
@@ -37,6 +41,10 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         homeworks: [],
         pageNumber: 0
     }],
+    setHeadline: (newHeadline) => {
+        set({ headline: newHeadline })
+        localStorage.setItem(HEADLINE, newHeadline)
+    },
     addPage: () => {
         let pages = Array.from(get().pages)
         pages.push({

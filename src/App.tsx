@@ -1,10 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import pdfMake from "pdfmake/build/pdfmake";
-//import pdfFonts from 'pdfmake/build/vfs_fonts';
 
 import { SchoolClassTypes, TaskForm } from './type/page';
-//pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { useTaskStore, WOCHENPLAN } from './states/TaskState';
 import './App.css'
 import PageView from './components/PageView';
@@ -25,8 +23,8 @@ pdfMake.fonts = {
 
 function App() {
   const ref = useRef<HTMLDivElement>(null)
-  const { pages, addClass, setPages, from, till, setFrom, setTill } = useTaskStore();
-
+  const { pages, addClass, setPages, from, till, setFrom, setTill, headline, setHeadline } = useTaskStore();
+  const [headlineInEdit, setHeadlineInEdit] = useState(false)
   const convertBase64 = async (file: String) => {
 
     let fileLocal = await (await fetch("./" + file)).blob()
@@ -216,7 +214,7 @@ function App() {
     ]
     pages.map((page, index) => {
       console.log(page)
-      completeContent.push({ text: 'Wochenplan  ' + generateUseFullDate(from) + " bis " + generateUseFullDate(till), style: 'header', margin: [0, 2, 10, 20] })
+      completeContent.push({ text: headline + generateUseFullDate(from) + " bis " + generateUseFullDate(till), style: 'header', margin: [0, 2, 10, 20] })
       completeContent.push(generateTable(index))
       completeContent.push({ text: 'Erledigt am:  ', style: 'header', margin: [0, 10, 10, 10] })
       completeContent.push({
@@ -257,7 +255,17 @@ function App() {
 
   return (
     <>
-      <h1 className='text-center mb-2'>Wochenplan: </h1>
+      <div className='flex justify-center'>
+        {headlineInEdit ?
+          <><input value={headline ? headline : ""} onChange={(e) => setHeadline(e.target.value)} />
+            <button onClick={() => { setHeadlineInEdit(false) }}>
+              <img width={20} height={20} src='./images/icons/floppy-disk-solid.svg'></img>
+            </button></>
+          : <><h1 className='text-center mb-2'>{headline} </h1>
+            <button onClick={() => { setHeadlineInEdit(true) }}>
+              <img width={20} height={20} src='./images/icons/pen-solid.svg'></img>
+            </button></>}
+      </div>
       <div className='flex gap-5 w-fit m-auto'>
         <div className='fit-content'>von </div><input className='fit-content' type="date" id="wochenplanStart" name="wochenplanStart" value={from.toISOString().substr(0, 10)} onChange={(e) => {
           if (e.target.valueAsNumber)
